@@ -43,6 +43,9 @@ embedder = cv2.dnn.readNetFromTorch(args["embedding_model"])
 recognizer = pickle.loads(open(args["recognizer"], "rb").read())
 le = pickle.loads(open(args["le"], "rb").read())
 
+if not (os.path.isdir(args["output"])):
+    os.makedirs(args["output"])
+
 # initialize the video stream, then allow the camera sensor to warm up
 print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
@@ -121,7 +124,7 @@ while True:
                         # print("HIIII")
                         people_detected_dict[name] = proba
                         # p = os.path.sep.join([args["output"],"{}.png".format(str(proba).zfill(5))])
-                        cv2.imwrite("output/{}.jpg".format(name), frame)				
+                        cv2.imwrite(args["output"],"{}.jpg".format(name), frame)				
 
             # draw the bounding box of the face along with the
             # associated probability

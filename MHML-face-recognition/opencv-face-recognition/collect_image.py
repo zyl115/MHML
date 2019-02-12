@@ -32,6 +32,9 @@ modelPath = os.path.sep.join([args["detector"],
 	"res10_300x300_ssd_iter_140000.caffemodel"])
 detector = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
 
+if not (os.path.isdir(args["output"])):
+    os.makedirs(args["output"])
+
 # initialize the video stream, then allow the camera sensor to warm up
 print("[INFO] starting video stream...")
 vs = VideoStream(src=0).start()
@@ -40,9 +43,10 @@ time.sleep(2.0)
 # start the FPS throughput estimator
 fps = FPS().start()
 total = 0
+im_col_count = 0
 
 # loop over frames from the video file stream
-while total < 20:
+while im_col_count < 30:
     # grab the frame from the threaded video stream
     frame = vs.read()
 
@@ -86,9 +90,11 @@ while total < 20:
             # construct a blob for the face ROI, then pass the blob
             # through our face embedding model to obtain the 128-d
             # quantification of the face
-
-            p = os.path.sep.join([args["output"],"{}.png".format(str(total).zfill(5))])
-            cv2.imwrite(p, frame)
+            if total%5==0:
+                
+                p = os.path.sep.join([args["output"],"{}.png".format(str(total).zfill(5))])
+                cv2.imwrite(p, frame)
+                im_col_count+=1
             total +=1
 
             # draw the bounding box of the face along with the
@@ -96,7 +102,6 @@ while total < 20:
             y = startY - 10 if startY - 10 > 10 else startY + 10
             cv2.rectangle(frame, (startX, startY), (endX, endY),
                 (0, 0, 255), 2)
-            time.sleep(0.2)
 
 
     # update the FPS counter
